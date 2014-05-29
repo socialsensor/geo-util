@@ -2,6 +2,8 @@ package eu.socialsensor.geo;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import eu.socialsensor.geonames.GeoObject;
 import eu.socialsensor.util.EasyBufferedReader;
 import net.sf.javaml.core.kdtree.KDTree;
@@ -33,7 +35,7 @@ public class ReverseGeocoder extends AbstractGeoService {
 		try {
 			city = (LightweightGeoObject)tree.nearest(q);
 		} catch (KeySizeException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		if (city == null) return null;
 		return countryCodes.get(city.getCountryCode());
@@ -46,45 +48,42 @@ public class ReverseGeocoder extends AbstractGeoService {
 	 * @param gnCountryInfoFile Geonames countryInfo.txt file, http://download.geonames.org/export/dump/countryInfo.txt
 	 */
 	public ReverseGeocoder(String gnObjectFile, String gnCountryInfoFile){
-		super(gnCountryInfoFile);
+		super(gnCountryInfoFile, Logger.getLogger("eu.socialsensor.geo.ReverseGeocoder"));
 		tree = new KDTree(2);
-		
-		Map<String, String> countryCodeMap = readCountryCodeMap(gnCountryInfoFile);
-		loadCitiesFileToTree(gnObjectFile, countryCodeMap);
-		
+		loadCitiesFileToTree(gnObjectFile, countryCodes);
 	}
 	
 	/**
 	 * A kd-tree is loaded with the set of geographical objects. The key for each entry
 	 * corresponds to its lat/lon coordinates, while the value is a LightweightGeoObject
-	 * @param citiesFilename
+	 * @param gnObjectsFilename
 	 * @param countryCodes
 	 */
-	protected void loadCitiesFileToTree(String citiesFilename, Map<String, String> countryCodes){
-		EasyBufferedReader reader = new EasyBufferedReader(citiesFilename);
+	protected void loadCitiesFileToTree(String gnObjectsFilename, Map<String, String> countryCodes){
+		EasyBufferedReader reader = new EasyBufferedReader(gnObjectsFilename);
 		String line = null;
 		int count = 0;
 		long t0 = System.currentTimeMillis();
+		logger.info("loading of objects started");
 		while ((line = reader.readLine()) != null){
 			if (line.trim().length() < 1) continue;
-
+			count++;
 			GeoObject city = new GeoObject(line);
-			if (count++ % 100000 == 0){
-				System.out.print("*");
-			}
+			
 			double[] coords = new double[2];
 			coords[0] = city.getLat();
 			coords[1] = city.getLon();
 			try {
 				tree.insert(coords, new LightweightGeoObject(city));
 			} catch (KeySizeException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			} catch (KeyDuplicateException e) {
-				e.printStackTrace();
+				logger.error(e.getMessage());
 			}
 		}
-		System.out.println("... in " + (System.currentTimeMillis()-t0)/1000.0 + "secs");
-		System.out.println();
+		logger.info(count + " objects loaded in " + (System.currentTimeMillis()-t0)/1000.0 + "secs");
+
 		reader.close();
+		logger.info("file " + gnObjectsFilename + " closed");
 	}
 }

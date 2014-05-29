@@ -9,5 +9,6 @@ alonissos
 kos
 rhodos
 θεσσαλονίκη
+athens
 ρόδος
 πειραιάς

@@ -3,11 +3,14 @@ package eu.socialsensor.geo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import eu.socialsensor.util.EasyBufferedReader;
 
 public class TestReverseGeocoder {
 
 	public static void main(String[] args) {
+		
 		
 		// args[0] should be the root folder where the geonames files reside
 		String rootGeonamesDir = args[0];
@@ -33,6 +36,8 @@ public class TestReverseGeocoder {
 		
 		ReverseGeocoder rgeoService = new ReverseGeocoder(citiesFile, countryInfoFile); 
 
+		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestReverseGeocoder");
+		
 		EasyBufferedReader reader = new EasyBufferedReader(testFile);
 		String line = null;
 		while ((line = reader.readLine())!=null){
@@ -40,7 +45,7 @@ public class TestReverseGeocoder {
 			double lat = Double.parseDouble(parts[0]);
 			double lon = Double.parseDouble(parts[1]);
 			
-			System.out.println(rgeoService.getCountryByLatLon(lat, lon) + " -> " + parts[2]);		
+			logger.info(rgeoService.getCountryByLatLon(lat, lon) + " -> " + parts[2]);		
 		}	
 		reader.close();
 	}
@@ -55,6 +60,8 @@ public class TestReverseGeocoder {
 	public static void testReverseGeoSpeed(String citiesFile, String countryInfoFile, String testFile, int nrQueries){
 		ReverseGeocoder rgeoService = new ReverseGeocoder(citiesFile, countryInfoFile); 
 
+		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestReverseGeocoder");
+		
 		EasyBufferedReader reader = new EasyBufferedReader(testFile);
 		String line = null;
 		List<String> lines = new ArrayList<String>();
@@ -78,14 +85,11 @@ public class TestReverseGeocoder {
 			rgeoService.getCountryByLatLon(lat, lon);
 			execTime += System.currentTimeMillis() - t0;
 			
-			if (i%1000 == 0){
-				System.out.print("-");
-			}
+			
 		}
-		System.out.println();
 		
-		System.out.println("Total exec time: " + execTime + "msec");
-		System.out.println("Average query time: " + (execTime/nrQueries) + "msec");
+		logger.info("Total exec time: " + execTime + "msec");
+		logger.info("Average query time: " + (execTime/nrQueries) + "msec");
 	}
 	
 	

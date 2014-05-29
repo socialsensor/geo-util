@@ -3,6 +3,8 @@ package eu.socialsensor.geo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import eu.socialsensor.util.EasyBufferedReader;
 
 public class TestCountrycoder {
@@ -24,13 +26,16 @@ public class TestCountrycoder {
 	public static void testCountrycoderAccuracy(String citiesFile, String countryInfoFile, String testFile){
 		Countrycoder countrycodingService = new Countrycoder(citiesFile, countryInfoFile);
 		
+		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestCountrycoder");
+		
+		
 		EasyBufferedReader reader = new EasyBufferedReader(testFile);
 		String line = null;
 		while ((line = reader.readLine())!=null){
 			String[] parts = line.split("\t");
 			// assume that parts[0] is the name
 			String country = countrycodingService.getCountryByLocationName(parts[0]);
-			System.out.println(parts[0] + " -> " + country);
+			logger.info(parts[0] + " -> " + country);
 		}
 		reader.close();
 	}
@@ -39,6 +44,8 @@ public class TestCountrycoder {
 	public static void testCountrycoderSpeed(String citiesFile, String countryInfoFile, String testFile, int nrQueries){
 		Countrycoder countrycoderService = new Countrycoder(citiesFile, countryInfoFile); 
 
+		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestCountrycoder");
+				
 		EasyBufferedReader reader = new EasyBufferedReader(testFile);
 		String line = null;
 		List<String> lines = new ArrayList<String>();
@@ -57,15 +64,10 @@ public class TestCountrycoder {
 			long t0 = System.currentTimeMillis();
 			countrycoderService.getCountryByLocationName(parts[0]);
 			execTime += System.currentTimeMillis() - t0;
-			
-			if (i%1000 == 0){
-				System.out.print("-");
-			}
 		}
-		System.out.println();
 		
-		System.out.println("Total exec time: " + execTime + "msec");
-		System.out.println("Average query time: " + (execTime/nrQueries) + "msec");
+		logger.info("Total exec time: " + execTime + "msec");
+		logger.info("Average query time: " + (execTime/nrQueries) + "msec");
 	}
 	
 }

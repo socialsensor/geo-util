@@ -1,5 +1,10 @@
 package eu.socialsensor.geonames;
 
+/**
+ * A direct mapping of the Geonames object as described in: http://download.geonames.org/export/dump/readme.txt (main geoname table)
+ * @author papadop
+ *
+ */
 public class GeoObject {
 
 	

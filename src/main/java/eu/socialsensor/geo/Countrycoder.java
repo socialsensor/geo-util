@@ -3,6 +3,8 @@ package eu.socialsensor.geo;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import eu.socialsensor.geonames.GeoObject;
 import eu.socialsensor.util.EasyBufferedReader;
 
@@ -18,7 +20,7 @@ public class Countrycoder extends AbstractGeoService {
 	private final Map<String, String> countryVocabulary;
 	
 	public Countrycoder(String gnObjectsFile, String gnCountryInfoFile){
-		super(gnCountryInfoFile);
+		super(gnCountryInfoFile, Logger.getLogger("eu.socialsensor.geo.Countrycoder"));
 		countryVocabulary = readCountryVocabulary(gnObjectsFile);
 	}
 	
@@ -39,19 +41,20 @@ public class Countrycoder extends AbstractGeoService {
 	
 	/**
 	 * 
-	 * @param citiesFilename
+	 * @param gnObjectsFilename
 	 * @return
 	 */
-	protected Map<String, String> readCountryVocabulary(String citiesFilename) {
+	protected Map<String, String> readCountryVocabulary(String gnObjectsFilename) {
 		Map<String, String> countryVoc = new HashMap<String, String>();
 		
-		EasyBufferedReader reader = new EasyBufferedReader(citiesFilename);
+		EasyBufferedReader reader = new EasyBufferedReader(gnObjectsFilename);
 		String line = null;
 		int count = 0;
 		long t0 = System.currentTimeMillis();
+		logger.info("loading of objects started");
 		while ((line = reader.readLine()) != null){
 			if (line.trim().length() < 1) continue;
-			
+			count++;
 			GeoObject city = new GeoObject(line);
 			countryVoc.put(city.getName().toLowerCase(), city.getCountryCode());
 			countryVoc.put(city.getAsciiName().toLowerCase(), city.getCountryCode());
@@ -62,15 +65,11 @@ public class Countrycoder extends AbstractGeoService {
 				}
 			}
 			
-			if (count++ % 100000 == 0){
-				System.out.print("*");
-			}
 		}
+		logger.info(count + "objects loaded in " + (System.currentTimeMillis()-t0)/1000.0 + "secs");
+		
 		reader.close();
-		
-		System.out.println("... in " + (System.currentTimeMillis()-t0)/1000.0 + "secs");
-		System.out.println();
-		
+		logger.info("file " + gnObjectsFilename + "closed ");
 		return countryVoc;
 	}
 }

@@ -2,6 +2,11 @@ package eu.socialsensor.geo;
 
 import eu.socialsensor.geonames.GeoObject;
 
+/**
+ * A lightweight version of a Geonames object (for memory efficiency reasons)
+ * @author papadop
+ *
+ */
 public class LightweightGeoObject {
 
 	protected int geonamesId;

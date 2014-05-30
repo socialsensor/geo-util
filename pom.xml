@@ -4,8 +4,10 @@
   <groupId>eu.socialsensor</groupId>
   <artifactId>geo-util</artifactId>
   <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
   
   <name>geo-util</name>
+  <url>https://github.com/socialsensor/geo-util</url>
   <description>A collection of methods that facilitate the analysis and indexing of geographical data.</description>
   
   <parent>
@@ -50,6 +52,7 @@
     </repository>
   </repositories>
   
+  <pluginRepositories />
   	
   <dependencies>
   	<dependency>

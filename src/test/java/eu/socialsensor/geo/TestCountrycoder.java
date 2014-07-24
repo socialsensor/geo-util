@@ -13,18 +13,21 @@ public class TestCountrycoder {
 	public static void main(String[] args) {
 		// args[0] should be the root folder where the geonames files reside
 		String rootGeonamesDir = args[0];
-		String gnCitiesFile = rootGeonamesDir + "cities1000.txt";
-		String gnAllCountriesFile = rootGeonamesDir + "allCountries.txt";
+		String gnCitiesFile = rootGeonamesDir + "cities1000_mod.txt";
 		String gnCountryInfoFile = rootGeonamesDir + "countryInfo.txt";
+		String gnAdminNames = rootGeonamesDir + "admin1CodesASCII_mod.txt";
 		String testFile = "test-names.txt";
+		String twitterTestFile = "twitter_accounts_locations.txt";
 				
-		testCountrycoderAccuracy(gnCitiesFile, gnCountryInfoFile, testFile);
+		//testCountrycoderAccuracy(gnCitiesFile, gnCountryInfoFile, gnAdminNames, testFile);
 		
-		testCountrycoderSpeed(gnAllCountriesFile, gnCountryInfoFile, testFile, 100000);
+		//testCountrycoderSpeed(gnCitiesFile, gnCountryInfoFile, gnAdminNames, testFile, 100000);
+		
+		testCountrycoderTwitterLocationField(gnCitiesFile, gnCountryInfoFile, gnAdminNames, twitterTestFile);
 	}
 	
-	public static void testCountrycoderAccuracy(String citiesFile, String countryInfoFile, String testFile){
-		Countrycoder countrycodingService = new Countrycoder(citiesFile, countryInfoFile);
+	public static void testCountrycoderAccuracy(String citiesFile, String countryInfoFile, String adminNamesFile, String testFile){
+		Countrycoder countrycodingService = new Countrycoder(citiesFile, countryInfoFile, adminNamesFile);
 		
 		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestCountrycoder");
 		
@@ -41,8 +44,8 @@ public class TestCountrycoder {
 	}
 	
 
-	public static void testCountrycoderSpeed(String citiesFile, String countryInfoFile, String testFile, int nrQueries){
-		Countrycoder countrycoderService = new Countrycoder(citiesFile, countryInfoFile); 
+	public static void testCountrycoderSpeed(String citiesFile, String countryInfoFile, String adminNamesFile, String testFile, int nrQueries){
+		Countrycoder countrycoderService = new Countrycoder(citiesFile, countryInfoFile, adminNamesFile); 
 
 		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestCountrycoder");
 				
@@ -70,4 +73,28 @@ public class TestCountrycoder {
 		logger.info("Average query time: " + (execTime/nrQueries) + "msec");
 	}
 	
+	
+	public static void testCountrycoderTwitterLocationField(String citiesFile, String countryInfoFile, String adminNamesFile, String testFile){
+		Countrycoder countrycoderService = new Countrycoder(citiesFile, countryInfoFile, adminNamesFile);
+		Logger logger = Logger.getLogger("eu.socialsensor.geo.TestCountrycoder");
+		
+		EasyBufferedReader reader = new EasyBufferedReader(testFile);
+		String line = null;
+		int count = 0;
+		while ((line = reader.readLine())!=null && (count++ < 1000)){
+			
+			String[] parts = line.split("\\s");
+			if (parts.length < 2 || (parts[1].trim().length() < 1)){
+				continue;
+			}
+			testSingleLocation(countrycoderService, line, logger);
+		}
+		reader.close();
+	}
+	
+	
+	protected static void testSingleLocation(Countrycoder countrycoderService, String text, Logger logger){
+		String location = countrycoderService.getLocation(text);
+		logger.info("Text: " + text + " -> " + location);
+	}
 }

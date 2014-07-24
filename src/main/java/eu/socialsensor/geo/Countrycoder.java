@@ -81,9 +81,12 @@ public class Countrycoder extends AbstractGeoService {
 	/**
 	 * Get an estimate of the referred location in a piece of text
 	 * @param text Arbitrary text string, e.g. the text of a tweet
-	 * @return Estimated location in the form City, Country or Country
+	 * @return Estimated location in the form of a map with keys 
+	 * "country", "city", "area", or empty map if no location is detected
 	 */
-	public String getLocation(String text){
+	public Map<String,String> getLocation(String text){
+		
+		Map<String, String> locationMap = new HashMap<String, String>();
 		
 		List<String> tokenList = getTokens(text);
 		
@@ -143,44 +146,70 @@ public class Countrycoder extends AbstractGeoService {
 		
 		// if nothing was found, return unknown
 		if (maxGnObject == null && detectedCountryCode == null && detectedCountryCodeByAdminName == null) {
-			return "unknown";
+			return locationMap;
 		}
 		
 		// if only country detected, return country
 		if (maxGnObject == null && detectedCountryCode != null && detectedCountryCodeByAdminName == null) {
-			return getCountryByCountryCode(detectedCountryCode);
+			locationMap.put(COUNTRY, getCountryByCountryCode(detectedCountryCode));
+			return locationMap;
 		}
 		
 		// if administrative name detected, return administrative name + country 
 		if (maxGnObject == null && detectedCountryCodeByAdminName != null) {
-			return detectedAdminName + ", " + getCountryByCountryCode(detectedCountryCodeByAdminName);
+			locationMap.put(AREA, detectedAdminName);
+			locationMap.put(COUNTRY, getCountryByCountryCode(detectedCountryCodeByAdminName));
+			return locationMap;
 		}
 		
 		// if both administrative name detected and city detected, check for consistency
 		if (maxGnObject != null && detectedCountryCodeByAdminName != null && detectedCountryCode == null) {
 			if (maxGnObject.getCountryCode().equals(detectedCountryCodeByAdminName)){
-				return maxGnObject.getName() + ", " + getCountryByCountryCode(maxGnObject.getCountryCode());
+				locationMap.put(CITY, maxGnObject.getName());
+				locationMap.put(COUNTRY, getCountryByCountryCode(maxGnObject.getCountryCode()));
+				return locationMap;
 			} else {
 				logger.info("Inconsistency found: While country was found to be " + detectedCountryCodeByAdminName + ", city was found to be " + maxGnObject.getName() + ", " + maxGnObject.getCountryCode());
-				return detectedAdminName + ", " + getCountryByCountryCode(detectedCountryCodeByAdminName);
+				locationMap.put(AREA, detectedAdminName);
+				locationMap.put(COUNTRY, getCountryByCountryCode(detectedCountryCodeByAdminName));
+				return locationMap;
 			}
 		}
 		
 		// if a city is detected, check for consistency with the detected country (if any) and
 		// return city only if it agrees with country, otherwise send only country
 		if (maxGnObject != null && detectedCountryCode == null) {
-			return maxGnObject.getName() + ", " + getCountryByCountryCode(maxGnObject.getCountryCode());
+			locationMap.put(CITY, maxGnObject.getName());
+			locationMap.put(COUNTRY, getCountryByCountryCode(maxGnObject.getCountryCode()));
+			return  locationMap;
 		}
 		if (maxGnObject != null && detectedCountryCode != null) {
 			if (maxGnObject.getCountryCode().equals(detectedCountryCode)){
-				return maxGnObject.getName() + ", " + getCountryByCountryCode(maxGnObject.getCountryCode());
+				locationMap.put(CITY, maxGnObject.getName());
+				locationMap.put(COUNTRY, getCountryByCountryCode(maxGnObject.getCountryCode()));
+				return  locationMap;
 			} else {
 				logger.info("Inconsistency found: While country was found to be " + detectedCountryCode + ", city was found to be " + maxGnObject.getName() + ", " + maxGnObject.getCountryCode());
-				return getCountryByCountryCode(detectedCountryCode);
+				locationMap.put(COUNTRY, getCountryByCountryCode(detectedCountryCode));
+				return locationMap;
 			}
 		}
-		return "unknown";
+		return locationMap;
 	}
+	private static final String COUNTRY = "country";
+	private static final String CITY = "city";
+	private static final String AREA = "area";
+	
+	public static String printLocationMap(Map<String, String> locMap){
+		if (locMap.isEmpty()) return "unknown";
+		String city = locMap.get(CITY);
+		String area = locMap.get(AREA);
+		String country = locMap.get(COUNTRY);
+		if (city != null) return city + ", " + country;
+		if (area != null) return area + ", " + country;
+		return country;
+	}
+	
 	
 	/**
 	 * Given an arbitrary text string, extract the referred names of locations 

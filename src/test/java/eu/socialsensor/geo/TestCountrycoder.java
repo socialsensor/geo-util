@@ -2,6 +2,7 @@ package eu.socialsensor.geo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -81,7 +82,7 @@ public class TestCountrycoder {
 		EasyBufferedReader reader = new EasyBufferedReader(testFile);
 		String line = null;
 		int count = 0;
-		while ((line = reader.readLine())!=null && (count++ < 1000)){
+		while ((line = reader.readLine())!=null && (count++ < 10000)){
 			
 			String[] parts = line.split("\\s");
 			if (parts.length < 2 || (parts[1].trim().length() < 1)){
@@ -94,7 +95,7 @@ public class TestCountrycoder {
 	
 	
 	protected static void testSingleLocation(Countrycoder countrycoderService, String text, Logger logger){
-		String location = countrycoderService.getLocation(text);
-		logger.info("Text: " + text + " -> " + location);
+		Map<String,String> locMap = countrycoderService.getLocation(text);
+		logger.info("Text: " + text + " -> " + Countrycoder.printLocationMap(locMap));
 	}
 }

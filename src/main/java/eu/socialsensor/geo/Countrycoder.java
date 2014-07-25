@@ -196,9 +196,10 @@ public class Countrycoder extends AbstractGeoService {
 		}
 		return locationMap;
 	}
-	private static final String COUNTRY = "country";
-	private static final String CITY = "city";
-	private static final String AREA = "area";
+	
+	public static final String COUNTRY = "country";
+	public static final String CITY = "city";
+	public static final String AREA = "area";
 	
 	public static String printLocationMap(Map<String, String> locMap){
 		if (locMap.isEmpty()) return "unknown";

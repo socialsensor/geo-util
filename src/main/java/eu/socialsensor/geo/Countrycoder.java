@@ -169,7 +169,7 @@ public class Countrycoder extends AbstractGeoService {
 				locationMap.put(COUNTRY, getCountryByCountryCode(maxGnObject.getCountryCode()));
 				return locationMap;
 			} else {
-				logger.info("Inconsistency found: While country was found to be " + detectedCountryCodeByAdminName + ", city was found to be " + maxGnObject.getName() + ", " + maxGnObject.getCountryCode());
+				//logger.info("Inconsistency found: While country was found to be " + detectedCountryCodeByAdminName + ", city was found to be " + maxGnObject.getName() + ", " + maxGnObject.getCountryCode());
 				locationMap.put(AREA, detectedAdminName);
 				locationMap.put(COUNTRY, getCountryByCountryCode(detectedCountryCodeByAdminName));
 				return locationMap;
@@ -189,7 +189,7 @@ public class Countrycoder extends AbstractGeoService {
 				locationMap.put(COUNTRY, getCountryByCountryCode(maxGnObject.getCountryCode()));
 				return  locationMap;
 			} else {
-				logger.info("Inconsistency found: While country was found to be " + detectedCountryCode + ", city was found to be " + maxGnObject.getName() + ", " + maxGnObject.getCountryCode());
+				//logger.info("Inconsistency found: While country was found to be " + detectedCountryCode + ", city was found to be " + maxGnObject.getName() + ", " + maxGnObject.getCountryCode());
 				locationMap.put(COUNTRY, getCountryByCountryCode(detectedCountryCode));
 				return locationMap;
 			}

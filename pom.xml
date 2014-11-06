@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
   	<groupId>eu.socialsensor</groupId>
   	<artifactId>geo-util</artifactId>
-  	<version>0.1</version>
+  	<version>0.2-SNAPSHOT</version>
   	<packaging>jar</packaging>
   
   	<name>geo-util</name>
@@ -36,7 +36,7 @@
    		<connection>scm:git:git@github.com:socialsensor/geo-util.git</connection>
  		<developerConnection>scm:git:git@github.com:socialsensor/geo-util.git</developerConnection>
    		<url>git@github.com:socialsensor/geo-util.git</url>
-  	  <tag>geo-util-0.1</tag>
+  	  <tag>HEAD</tag>
   </scm>
   
   	<properties>
